@@ -55,8 +55,11 @@
 											"    pm.expect(jsonData[i].content).to.be.eql(targetTask);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"Content-Type is present\", function () {\r",
+											"pm.test(\"Content-Type is present and has a application/json value\", function () {\r",
+											"    const contentType = pm.response.headers.idx(0).value\r",
+											"    console.log(pm.response)\r",
 											"    pm.response.to.have.header(\"Content-Type\")\r",
+											"    pm.expect(contentType).to.be.eql(\"application/json\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -119,8 +122,10 @@
 											"    pm.expect(jsonData.content).to.eql(content);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"Content-Type is present\", function () {\r",
+											"pm.test(\"Content-Type is present and has a application/json value\", function () {\r",
+											"    const contentType = pm.response.headers.idx(0).value\r",
 											"    pm.response.to.have.header(\"Content-Type\")\r",
+											"    pm.expect(contentType).to.be.eql(\"application/json\");\r",
 											"});\r",
 											"\r",
 											"pm.environment.set(\"taskId\", jsonData.id);"
@@ -187,8 +192,10 @@
 											"    pm.expect(jsonData.completed).to.eql(false);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"Content-Type is present\", function () {\r",
+											"pm.test(\"Content-Type is present and has a application/json value\", function () {\r",
+											"    const contentType = pm.response.headers.idx(0).value\r",
 											"    pm.response.to.have.header(\"Content-Type\")\r",
+											"    pm.expect(contentType).to.be.eql(\"application/json\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -231,6 +238,8 @@
 											"    pm.expect(responseStatus).to.eql(\"No Content\");\r",
 											"});\r",
 											"\r",
+											"pm.environment.set(\"newTaskName\", \"Updated task\");\r",
+											"\r",
 											""
 										],
 										"type": "text/javascript"
@@ -255,6 +264,49 @@
 									"mode": "raw",
 									"raw": "{\r\n    \"content\": \"Updated task\"\r\n}"
 								},
+								"url": {
+									"raw": "{{baseURL}}/{{taskId}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a renamed task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonStatus = pm.response.status;\r",
+											"var jsonData = pm.response.json();\r",
+											"console.log(pm.response)\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Task was found\", function () {\r",
+											"    pm.expect(jsonStatus).to.eql(\"OK\");\r",
+											"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"taskId\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Task has the new name\", function () {\r",
+											"    pm.expect(jsonData.content).to.eql(pm.environment.get(\"newTaskName\"));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
 								"url": {
 									"raw": "{{baseURL}}/{{taskId}}",
 									"host": [
@@ -316,6 +368,42 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get a closed task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonStatus = pm.response.status;\r",
+											"\r",
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Task was not found\", function () {\r",
+											"    pm.expect(jsonStatus).to.eql(\"Not Found\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/{{taskId}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -357,6 +445,49 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get a reopened task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonStatus = pm.response.status;\r",
+											"var jsonData = pm.response.json();\r",
+											"console.log(pm.response)\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Task was found\", function () {\r",
+											"    pm.expect(jsonStatus).to.eql(\"OK\");\r",
+											"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"taskId\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Task is not complete\", function () {\r",
+											"    pm.expect(jsonData.completed).to.eql(false);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/{{taskId}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -376,7 +507,6 @@
 											"\r",
 											"pm.test(\"Check if content is empty\", function () {\r",
 											"    var responseStatus = pm.response.status;\r",
-											"    console.log(pm.response)\r",
 											"    pm.expect(responseStatus).to.eql(\"No Content\");\r",
 											"});"
 										],
@@ -386,6 +516,42 @@
 							],
 							"request": {
 								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/{{taskId}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a deleted task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonStatus = pm.response.status;\r",
+											"\r",
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Task was not found\", function () {\r",
+											"    pm.expect(jsonStatus).to.eql(\"Not Found\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
 								"header": [],
 								"url": {
 									"raw": "{{baseURL}}/{{taskId}}",
