@@ -13,4 +13,4 @@
 
 If you want to run the tests without a report, you can simply run:
 
-<code>npx newman run ./App/Tests/collection/Todoist.postman_collection.json -e ./App/Tests/envVariables/Todoist.postman_environment.jso</code>
+<code>npx newman run ./App/Tests/collection/Todoist.postman_collection.json -e ./App/Tests/envVariables/Todoist.postman_environment.json</code>
